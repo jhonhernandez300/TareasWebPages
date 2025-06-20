@@ -1,0 +1,75 @@
+﻿@{
+    var nombre = Request.Form["nombre"];
+    var email = Request.Form["email"];
+    var password = Request.Form["password"];
+    var mensaje = "";
+    var esValido = true;
+    var mensajeError = "";
+
+    if (IsPost)
+    {
+        if (!System.Text.RegularExpressions.Regex.IsMatch(nombre, @"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"))
+        {
+            esValido = false;
+            mensajeError = "El nombre solo debe contener letras y espacios.";
+        }
+
+        if (esValido)
+        {
+            var db = Database.Open("DefaultConnection");
+            db.Execute("AgregarUsuario @0, @1, @2", nombre, email, password);
+            mensaje = "Usuario registrado correctamente.";
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro de Usuario</title>
+    <script src="/Scripts/Validar.js"></script>
+    <style>
+        .invalido {
+            border-color: red;
+        }
+
+        .mensaje-error {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h2>Registrar Usuario</h2>
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <p style="color: red;">@mensajeError</p>
+    }
+
+    <form method="post">
+        <label>Nombre:</label><br />
+        <input type="text" id="nombre" name="nombre" required pattern="[A-Za-zÁÉÍÓÚáéíóúÑñ ]+"
+               title="Solo letras y espacios" value="@nombre" />
+        <span id="error-nombre" class="mensaje-error"></span><br />
+
+        <label>Email:</label><br />
+        <input type="email" id="email" name="email" required value="@email" />
+        <span id="error-email" class="mensaje-error"></span><br />
+
+        <label>Password:</label><br />
+        <input type="password" name="password" required /><br /><br />
+
+        <input type="submit" value="Registrar" />
+    </form>
+
+    @if (!string.IsNullOrEmpty(mensaje))
+    {
+        <p style="color: green;">@mensaje</p>
+    }
+
+    <script>
+        Validar.letrasYEspacios("nombre", "error-nombre");
+        Validar.email("email", "error-email");
+    </script>
+</body>
+</html>
