@@ -1,0 +1,29 @@
+﻿<!-- /Shared/_Layout.cshtml -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@Page.Title</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            padding-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h2 class="text-center">Tareas</h2>
+            <hr />
+        </header>
+
+        @RenderBody()
+
+        <hr />
+        <footer class="text-center">
+            <p>&copy; 2025 - Jhon Hernández</p>
+        </footer>
+    </div>
+</body>
+</html>
