@@ -1,0 +1,122 @@
+﻿@{
+    Layout = "~/Shared/_Layout.cshtml";
+    Page.Title = "Listado de Usuarios";
+
+    var usuarios = new List<dynamic>();
+    var mensajeError = "";
+
+    var filtro = Request["filtro"];
+    var accion = Request["accion"];
+
+    try
+    {
+        if (accion != "limpiar")
+        {
+            var db = Database.Open("DefaultConnection");
+            usuarios = db.Query("EXEC ObtenerUsuarios").ToList();
+
+            if (!string.IsNullOrWhiteSpace(filtro))
+            {
+                filtro = filtro.ToLower();
+                usuarios = usuarios
+                    .Where(u => u.Nombre.ToLower().Contains(filtro) || u.Email.ToLower().Contains(filtro))
+                    .ToList();
+            }
+        }
+        else
+        {
+            filtro = "";
+        }
+    }
+    catch (Exception ex)
+    {
+        mensajeError = ex.Message;
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Listado de Usuarios</title>
+    <style>
+        .tabla-usuarios {
+            margin-top: 30px;
+        }
+
+        .card-busqueda {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+
+        .acciones {
+            width: 160px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container tabla-usuarios">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1">
+
+                <div class="card-busqueda">
+                    <form method="get" class="form-inline text-center">
+                        <div class="form-group">
+                            <input type="text" name="filtro" value="@filtro" class="form-control" placeholder="Buscar por nombre o email" style="width: 300px;" />
+                        </div>
+                        <button type="submit" name="accion" value="buscar" class="btn btn-primary">Buscar</button>
+                        <button type="submit" name="accion" value="limpiar" class="btn btn-default">Limpiar</button>
+                    </form>
+                </div>
+
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="text-center">Listado de Usuarios Registrados</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        @if (!string.IsNullOrEmpty(mensajeError))
+                        {
+                            <div class="alert alert-danger text-center">@mensajeError</div>
+                        }
+                        else if (usuarios.Count == 0)
+                        {
+                            <div class="alert alert-warning text-center">No hay usuarios con ese parámetro.</div>
+                        }
+                        else
+                        {
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th class="acciones">Acciones</th> 
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var u in usuarios)
+                                    {
+                                        <tr>
+                                            <td>@u.UsuarioId</td>
+                                            <td>@u.Nombre</td>
+                                            <td>@u.Email</td>
+                                            <td class="acciones"> 
+                                                <a href="EditarUsuario.cshtml?id=@u.UsuarioId" class="btn btn-sm btn-warning">Editar</a>
+                                                <a href="#" class="btn btn-sm btn-danger">Borrar</a> 
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

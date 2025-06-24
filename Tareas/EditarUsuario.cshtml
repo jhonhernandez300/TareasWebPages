@@ -1,0 +1,176 @@
+﻿@{
+    Layout = "~/Shared/_Layout.cshtml";
+    Page.Title = "Editar Usuario";
+
+    var id = Request["id"];
+    var nombre = "";
+    var email = "";
+    var password = "";
+
+    var mensaje = "";
+    var mensajeError = "";
+    var esValido = true;
+    var mostrarFormulario = true; // ✅ NUEVO
+
+    var db = Database.Open("DefaultConnection");
+
+    if (!IsPost && !string.IsNullOrEmpty(id))
+    {
+        var usuario = db.QuerySingle("SELECT * FROM Usuarios WHERE UsuarioId = @0", id);
+        if (usuario != null)
+        {
+            nombre = usuario.Nombre;
+            email = usuario.Email;
+            password = usuario.Password;
+        }
+        else
+        {
+            mensajeError = "Usuario no encontrado.";
+            mostrarFormulario = false;
+        }
+    }
+
+    if (IsPost)
+    {
+        nombre = Request.Form["nombre"];
+        email = Request.Form["email"];
+        password = Request.Form["password"];
+
+        if (string.IsNullOrWhiteSpace(nombre))
+        {
+            esValido = false;
+            mensajeError = "El nombre es obligatorio.";
+        }
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(nombre, @"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"))
+        {
+            esValido = false;
+            mensajeError = "El nombre solo debe contener letras y espacios.";
+        }
+
+        if (esValido && string.IsNullOrWhiteSpace(email))
+        {
+            esValido = false;
+            mensajeError = "El email es obligatorio.";
+        }
+        else if (esValido && !System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+        {
+            esValido = false;
+            mensajeError = "El formato del email no es válido.";
+        }
+
+        if (esValido && string.IsNullOrWhiteSpace(password))
+        {
+            esValido = false;
+            mensajeError = "La contraseña es obligatoria.";
+        }
+        else if (esValido && password.Length < 6)
+        {
+            esValido = false;
+            mensajeError = "La contraseña debe tener al menos 6 caracteres.";
+        }
+
+        if (esValido)
+        {
+            try
+            {
+                db.Execute("EXEC EditarUsuario @0, @1, @2, @3", id, nombre, email, password);
+                mensaje = "Usuario actualizado correctamente.";
+
+                // ✅ Limpiar y ocultar formulario
+                nombre = "";
+                email = "";
+                password = "";
+                mostrarFormulario = false;
+            }
+            catch (Exception ex)
+            {
+                mensajeError = ex.Message;
+            }
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Usuario</title>
+    <script src="/Scripts/Validar.js"></script>
+    <style>
+        .invalido {
+            border-color: red;
+        }
+
+        .mensaje-error {
+            color: red;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2 class="text-center" style="color: #003366;">Editar Usuario</h2>
+                    </div>
+                    <div class="panel-body">
+
+                        @if (!string.IsNullOrEmpty(mensajeError))
+                        {
+                            <div class="alert alert-danger">@mensajeError</div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(mensaje))
+                        {
+                            <div class="alert alert-success">@mensaje</div>
+                        }
+
+                        @if (mostrarFormulario)
+                        {
+                            <!-- ✅ Formulario solo si mostrarFormulario == true -->
+                            <form method="post" role="form">
+                                <div class="form-group">
+                                    <label for="nombre">Nombre</label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" value="@nombre" required />
+                                    <span id="error-nombre" class="mensaje-error"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" value="@email" required />
+                                    <span id="error-email" class="mensaje-error"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="password">Contraseña</label>
+                                    <input type="password" class="form-control" id="password" name="password" value="@password" required />
+                                    <span id="error-password" class="mensaje-error"></span>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block">Guardar Cambios</button>
+                                <a href="Usuarios.cshtml" class="btn btn-default btn-block">Cancelar</a>
+                            </form>
+                        }
+                        else
+                        {
+                            <!-- ✅ Mostrar solo este bloque si el formulario ya no se debe ver -->
+                            <div class="text-center">
+                                <a href="BuscarUsuario.cshtml" class="btn btn-success">Volver a Buscar Usuario</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (mostrarFormulario)
+    {
+        <script>
+            Validar.letrasYEspacios("nombre", "error-nombre");
+            Validar.email("email", "error-email");
+            Validar.password("password", "error-password");
+        </script>
+    }
+</body>
+</html>

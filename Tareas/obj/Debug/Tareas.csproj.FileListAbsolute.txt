@@ -43,6 +43,8 @@ C:\Users\jhon\OneDrive\Documentos\Web Pages\Tareas\Tareas\bin\System.Web.WebPage
 C:\Users\jhon\OneDrive\Documentos\Web Pages\Tareas\Tareas\bin\System.Web.WebPages.Razor.xml
 C:\Users\jhon\OneDrive\Documentos\Web Pages\Tareas\Tareas\bin\WebMatrix.Data.xml
 C:\Users\jhon\OneDrive\Documentos\Web Pages\Tareas\Tareas\bin\WebMatrix.WebData.xml
-C:\Users\jhon\OneDrive\Documentos\Web Pages\Tareas\Tareas\obj\Debug\Tareas.csprojResolveAssemblyReference.cache
 C:\Users\jhon\OneDrive\Documentos\Web Pages\Tareas\Tareas\obj\Debug\Tareas.dll
 C:\Users\jhon\OneDrive\Documentos\Web Pages\Tareas\Tareas\obj\Debug\Tareas.pdb
+C:\Users\jhon\OneDrive\Documentos\Web Pages\Tareas\Tareas\obj\Debug\Tareas.csproj.AssemblyReference.cache
+C:\Users\jhon\OneDrive\Documentos\Web Pages\Tareas\Tareas\obj\Debug\Tareas.csproj.CoreCompileInputs.cache
+C:\Users\jhon\OneDrive\Documentos\Web Pages\Tareas\Tareas\obj\Debug\Tareas.csproj.Up2Date
